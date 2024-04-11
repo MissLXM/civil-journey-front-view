@@ -6,7 +6,10 @@
     >
         <!-- 通知信息容器 -->
         <div class="message-info-container">
-            <div class="message-info-text">消息中心</div>
+            <div class="message-info-header-container">
+                <div class="message-info-text">消息中心</div>
+                <el-button size="small" type="info" @click="clearReadNotice">清空已读</el-button>
+            </div>
             <div class="message-info-item-container">
                 <el-empty v-if="noticeAllInfo == undefined"/>
                 <div 
@@ -87,8 +90,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { showUserNotice, updateNoticeStatus } from '@/api/feedback';
+import { userStore } from '@/stores/user';
+import { showUserNotice, updateNoticeStatus, deleteReadNotice } from '@/api/feedback';
 
+// 用户信息
+const user = userStore()
 // 分页参数
 const pageParams = ref({
     currentPage: 1,
@@ -111,6 +117,21 @@ onMounted(() => {
     // 加载用户通知信息
     loadUserNotice(false)
 })
+
+
+// 清空已读通知
+function clearReadNotice() {
+    deleteReadNotice(user.userId).then(response => {
+        if (response.data.code === 200) {
+            ElMessage.success('操作成功')
+            loadUserNotice(false)
+        } else if (response.data.code === 404) {
+            ElMessage.info('未存在已读通知')
+        } else {
+            ElMessage.error('操作失败')
+        }
+    })
+}
 
 // 滚动加载用户通知信息
 const userNoticeLoad = () => {
@@ -177,11 +198,19 @@ function loadUserNotice(isLoad: boolean) {
 
     // 消息信息容器
     .message-info-container {
-        // 消息文本
-        .message-info-text {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 1rem;
+
+        // 消息信息头部
+        .message-info-header-container {
+            display: flex; 
+            align-items: center;
+            margin-bottom: 1rem; 
+            justify-content: space-between; 
+
+            // 消息文本
+            .message-info-text {
+                font-size: 20px;
+                font-weight: 600;
+            }
         }
 
         // 消息信息元素(容器)

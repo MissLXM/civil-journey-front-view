@@ -52,6 +52,10 @@
                             </el-popconfirm>
                         </div>
                         <div v-else-if="item.status === 1" class="yes-pay-text">已支付</div>
+                        <div v-else-if="item.status === 2" class="no-pay">
+                            <div class="no-pay-text">已退款</div>
+                            <el-button type="danger" @click="deleteOrderEvent(item.orderId)">删除订单</el-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,7 +66,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { showOrderInfo } from '@/api/pay';
+import { showOrderInfo, deleteOrder } from '@/api/pay';
 
 // 订单信息
 const order = ref()
@@ -105,6 +109,18 @@ function confirmEvent(item: any) {
         + '&tradeAmount=' + item.tradeAmount
         + '&useFreeNumber=' + item.useFreeNumber
     , '_self', '')
+}
+
+// 删除订单
+function deleteOrderEvent(orderId: any) {
+    deleteOrder(orderId).then(response => {
+        if (response.data.code === 200) {
+            loadOrderInfo()
+            ElMessage.success('删除成功')
+        } else {
+            ElMessage.error('删除失败')
+        }
+    })
 }
 
 </script>

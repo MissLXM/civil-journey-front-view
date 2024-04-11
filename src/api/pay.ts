@@ -15,3 +15,11 @@ export function isPayCourse(courseId: any) {
         method: 'GET'
     })
 }
+
+// 删除指定的订单
+export function deleteOrder(orderId: any) {
+    return request({
+        url: `/payment-center-service/pay/deleteOrder/${orderId}`,
+        method: 'DELETE'
+    })
+}

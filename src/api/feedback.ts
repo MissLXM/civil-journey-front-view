@@ -24,3 +24,11 @@ export function submitOpinion(username: any, message: any) {
         method: 'POST'
     })
 }
+
+// 清空已读通知
+export function deleteReadNotice(userId: any) {
+    return request({
+        url: `/feedback-center-service/front/notice/deleteReadNotice/${userId}`,
+        method: 'DELETE'
+    })
+}

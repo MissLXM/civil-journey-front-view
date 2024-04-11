@@ -5,7 +5,7 @@
     >
         <!-- 课程视频容器 -->
         <div class="course-video-play-container">
-            <!-- 课程视频顶部容器 -->
+            <!-- 课程视频顶部容器 --> 
             <div class="course-video-play-header-container">
                 <!-- 左侧容器 -->
                 <div class="course-video-play-header-left-container">
@@ -167,7 +167,18 @@
 
                         <!-- 右侧布局 -->
                         <div class="comment-info-right-container">
-                            <div class="comment-time">{{ item.commentTime }}</div>
+                            <div class="comment-time">
+                                <span>{{ item.commentTime }}</span>
+                                <el-button 
+                                    circle
+                                    size="small" 
+                                    type="danger"
+                                    :icon="Delete" 
+                                    v-if="item.userId == user.userId" 
+                                    @click="deleteCommentEvent(item.videoCommentId)"
+                                    style="margin-left: 0.5rem; margin-top: -0.15rem;"
+                                />
+                            </div>
                             <div class="comment-content">
                                 {{ item.commentContent }}
                             </div>
@@ -219,6 +230,8 @@ import  V3Emoji  from 'vue3-emoji'
 import 'vue3-emoji/dist/style.css'
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { userStore } from '@/stores/user';
+import { Delete } from '@element-plus/icons-vue'
 import TeacherInfoDialog from '@/components/dialog/TeacherInfoDialog.vue'
 import { showCourseInfo, likeOrNoLikeCourse, collectionOrNoCollectionCourse } from '@/api/course'
 import { 
@@ -226,10 +239,12 @@ import {
     sendVideoComments, 
     likeOrNoLikeVideo, 
     showVideoComments, 
+    deleteVideoComment,
     insertVideoSchedule, 
     showVideoCollectionInfo 
 } 
 from '@/api/video';
+
 
  
 // 写评论
@@ -263,15 +278,10 @@ const courseInfo = ref({
     courseDescription: '',
     teacherIntroduction: ''
 })
+// 用户信息
+const user = userStore()
 // 评论信息
-const commentInfo = ref([
-    {
-        commentTime: '',
-        commenterName: '',
-        commentContent: '',
-        commenterAvatar: '',
-    }
-])
+const commentInfo = ref()
 // 视频配置
 let playerOptions = ref({
     // 允许缩放
@@ -456,7 +466,7 @@ function courseCollectionEvent() {
     })
 }
  
-// 递归加载视频合集信息
+// 加载视频合集信息
 function reLoadVideoCollectionInfo() {
     showVideoCollectionInfo(courseParams.value).then(response => {
         if (response.data.code === 200) {
@@ -542,6 +552,19 @@ function loadVideoComments(videoId: any) {
     showVideoComments(videoId).then(response => {
         if (response.data.code === 200) {
             commentInfo.value = response.data.data
+        }
+    })
+}
+
+// 删除评论事件
+function deleteCommentEvent(commentId: any) {
+    deleteVideoComment(commentId).then(response => {
+        if (response.data.code === 200) {
+            ElMessage.success('操作成功')
+            // 加载视频评论信息
+            loadVideoComments(route.params.videoId)
+        } else {
+            ElMessage.error('操作失败')
         }
     })
 }
@@ -859,7 +882,6 @@ function loadVideoCollectionInfo(courseId: any, isUpOrDown: boolean) {
                 // 评论信息元素
                 .comment-info-item {
                     width: 100%;
-                    height: 6rem;
                     display: flex;
                     margin-bottom: 1rem;
                     border-radius: 0.5rem;
@@ -910,14 +932,9 @@ function loadVideoCollectionInfo(courseId: any, isUpOrDown: boolean) {
                             cursor: pointer;
                             text-indent: 1em;
                             font-weight: 400;
-                            line-height: 19px;
-                            margin-top: 0.3rem;
+                            line-height: 20px;
+                            margin: 0.5rem 0 1rem 0;
 
-                            overflow: hidden;
-                            display: -webkit-box;
-                            -webkit-line-clamp: 2;
-                            text-overflow: ellipsis;
-                            -webkit-box-orient: vertical;
                         }
                     }
                 }   

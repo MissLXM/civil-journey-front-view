@@ -145,7 +145,18 @@
 
                             <!-- 右侧布局 -->
                             <div class="comment-info-right-container">
-                                <div class="comment-time">{{ item.commentTime }}</div>
+                                <div class="comment-time">
+                                    <span>{{ item.commentTime }}</span>
+                                    <el-button 
+                                        circle
+                                        size="small" 
+                                        type="danger"
+                                        :icon="Delete" 
+                                        v-if="item.userId == user.userId" 
+                                        style="margin-left: 0.5rem; margin-top: -0.15rem;"
+                                        @click="deleteCommentEvent(item.articleCommentsId)"
+                                    />
+                                </div>
                                 <div class="comment-content">
                                     {{ item.commentContent }}
                                 </div>
@@ -193,12 +204,15 @@ import {
     showArticleInfo, 
     showChoiceArticle, 
     likeOrNoLikeArticle, 
+    deleteArticleComment,
     showMedalInfoByUserId, 
     commentInfoByArticleId,
     sendCommentByArticleId,
-    CollectionOrNoCollectionArticle 
+    CollectionOrNoCollectionArticle, 
 } 
 from '@/api/article';
+import { userStore } from '@/stores/user';
+import { Delete } from '@element-plus/icons-vue'
 
 
 
@@ -206,6 +220,8 @@ from '@/api/article';
 const comment = ref()
 // 勋章信息
 const medalInfo = ref()
+// 用户信息
+const user = userStore()
 // 路由信息
 const route = useRoute()
 // 热门文章
@@ -237,6 +253,7 @@ const articleInfo = ref({
     articleContent: '',
     collectionNumber: 0,
 })
+
 // 中文的表情组
 const optionsName = ref({
     'Smileys & Emotion': '笑脸&表情',
@@ -280,7 +297,6 @@ function likeEvent() {
             showArticleInfo(route.params.articleId).then(response => {
                 if (response.data.code === 200) {
                     articleInfo.value = response.data.data
-
                 }
             })
         }
@@ -294,7 +310,6 @@ function CollectionEvent() {
             showArticleInfo(route.params.articleId).then(response => {
                 if (response.data.code === 200) {
                     articleInfo.value = response.data.data
-
                 }
             })
         }
@@ -364,7 +379,18 @@ function loadArticleInfo(articleId: any) {
     })
 }
 
-
+// 删除评论事件
+function deleteCommentEvent(commentId: any) {
+    deleteArticleComment(commentId).then(response => {
+        if (response.data.code === 200) {
+            ElMessage.success('操作成功')
+            // 加载评论信息
+            loadCommentInfo()
+        } else {
+            ElMessage.error('操作失败')
+        }
+    })
+}
 </script>
 
 <style lang="less" scoped>
@@ -651,7 +677,6 @@ function loadArticleInfo(articleId: any) {
                     // 评论信息元素
                     .comment-info-item {
                         width: 98%;
-                        height: 6rem;
                         display: flex;
                         margin-bottom: 1rem;
                         border-radius: 0.5rem;
@@ -703,14 +728,9 @@ function loadArticleInfo(articleId: any) {
                                 cursor: pointer;
                                 text-indent: 1em;
                                 font-weight: 400;
-                                line-height: 19px;
-                                margin-top: 0.3rem;
+                                line-height: 20px;
+                                margin: 0.5rem 0 1rem 0;
 
-                                overflow: hidden;
-                                display: -webkit-box;
-                                -webkit-line-clamp: 2;
-                                text-overflow: ellipsis;
-                                -webkit-box-orient: vertical;
                             }
                         }
                     }

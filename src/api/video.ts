@@ -67,3 +67,12 @@ export function insertVideoSchedule(scheduleParams: any) {
         data: scheduleParams
     })  
 }
+
+
+// 删除评论信息
+export function deleteVideoComment(commentId: any) {
+    return request({
+        url: `/course-center-service/front/video/deleteVideoComment/${commentId}`,
+        method: 'DELETE'
+    })
+}

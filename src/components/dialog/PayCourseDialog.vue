@@ -108,7 +108,7 @@ onMounted(() => {
 }) 
 
 // 确认支付事件 
-function confirmEvent() { 
+function confirmEvent() {  
     if (props.payCourseId != undefined && props.payMoney != undefined) {
         if (phone.value != undefined && phone.value != null && phone.value != '' &&
         consignee.value != undefined && consignee.value != null && consignee.value != '' ) {

@@ -135,3 +135,11 @@ export function deleteArticle(articleId: any) {
         method: 'DELETE'
     })
 }
+
+// 删除评论信息
+export function deleteArticleComment(commentId: any) {
+    return request({
+        url: `/article-center-service/front/article/deleteComment/${commentId}`,
+        method: 'DELETE'
+    })
+}
